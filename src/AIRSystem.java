@@ -2,7 +2,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
-
+import java.io.FileNotFoundException;
 import javax.imageio.ImageIO;
 
 /**
@@ -52,19 +52,26 @@ public class AIRSystem {
 	private ArrayList<TrainingImage> getTrainingImages(File directory)
 	{
 		ArrayList<TrainingImage> images = new ArrayList<TrainingImage>();
-		
-		for(final File image : directory.listFiles())
+	
+		try
 		{
-			try
+			if(!directory.isDirectory())
+				throw new FileNotFoundException("The directory \"" + directory.getAbsolutePath() + "\" does not exist.");
+				
+			for(final File image : directory.listFiles())
 			{
+				
+				if(!image.isFile())
+					throw new FileNotFoundException(image.getName() + " does not exist.");
+				
 				boolean isGlaucoma = image.getName().contains("glaucoma") ? true : false;
 				BufferedImage img = ImageIO.read(image);
 				images.add(new TrainingImage(img, isGlaucoma));
 			}
-			catch(Exception ex)
-			{
-				System.err.println(ex.getMessage());
-			}
+		}
+		catch(Exception ex)
+		{
+			System.err.println(ex.getMessage());
 		}
 		
 		return images;
