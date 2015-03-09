@@ -12,14 +12,31 @@ import javax.imageio.ImageIO;
  */
 public class AIRSystem {
 	
+	// Initialise the different components.
+	private PreProcessor pre;
+	
 	public AIRSystem()
 	{
+		pre = new PreProcessor();
 	}
 	
 	public void train(File directory)
 	{
 		// Load the images.
 		ArrayList<TrainingImage> images = getTrainingImages(directory);
+		
+		// Process each image.
+		for(TrainingImage image: images)
+		{
+			// Get the actual image for processing.
+			BufferedImage processedImage = image.getImage();
+			
+			// Process the image.
+			processedImage = pre.process(processedImage);
+			// perform segmentation.
+			// perform post-processing.
+			// train the classifier with image.
+		}
 		
 	}
 	
@@ -65,7 +82,7 @@ public class AIRSystem {
 					throw new FileNotFoundException(image.getName() + " does not exist.");
 				
 				boolean isGlaucoma = image.getName().contains("glaucoma") ? true : false;
-				BufferedImage img = ImageIO.read(image);
+				BufferedImage img = ImageOp.readInImage(image.getAbsolutePath());
 				images.add(new TrainingImage(img, isGlaucoma));
 			}
 		}
