@@ -14,12 +14,22 @@ public class AIRSystem {
 	
 	// Initialise the different components.
 	private PreProcessor pre;
+	private PostProcessor post;
+	private Segmenter seg;
+	private Classifier classifier;
 	
 	public AIRSystem()
 	{
 		pre = new PreProcessor();
+		post = new PostProcessor();
+		seg = new Segmenter();
+		classifier = new Classifier();
 	}
 	
+	/**
+	 * Trains the system using images in the given directory.
+	 * @param directory The directory containing the training images.
+	 */
 	public void train(File directory)
 	{
 		// Load the images.
@@ -33,13 +43,18 @@ public class AIRSystem {
 			
 			// Process the image.
 			processedImage = pre.process(processedImage);
-			// perform segmentation.
-			// perform post-processing.
-			// train the classifier with image.
+			processedImage = seg.segment(processedImage);
+			processedImage = post.process(processedImage);
+			
+			// Train the classifier using the image.
+			classifier.train(new TrainingImage(processedImage, image.isPositive()));
 		}
-		
 	}
 	
+	/**
+	 * Trains the system using images in the given directory.
+	 * @param directoryName The directory containing the training images.
+	 */
 	public void train(String directoryName)
 	{
 		File directory = new File(directoryName.replace("\"", ""));
