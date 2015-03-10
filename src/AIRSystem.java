@@ -47,7 +47,7 @@ public class AIRSystem {
 			processedImage = post.process(processedImage);
 			
 			// Train the classifier using the image.
-			classifier.train(new TrainingImage(processedImage, image.isPositive()));
+			classifier.train(new TrainingImage(processedImage, image.isPositive(), image.getFileName()));
 		}
 	}
 	
@@ -98,7 +98,7 @@ public class AIRSystem {
 				
 				boolean isGlaucoma = image.getName().contains("glaucoma") ? true : false;
 				BufferedImage img = ImageOp.readInImage(image.getAbsolutePath());
-				images.add(new TrainingImage(img, isGlaucoma));
+				images.add(new TrainingImage(img, isGlaucoma, image.getName()));
 			}
 		}
 		catch(Exception ex)
