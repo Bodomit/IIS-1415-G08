@@ -1,21 +1,17 @@
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-
 public class Classifier 
 {
 	public Classifier()
 	{
 	}
 	
-	public void train(TrainingImage image)
+	public void train(ArrayList<TrainingVector> vectors)
 	{
-		
-	}
-	
-	public void trainAll(ArrayList<TrainingImage> images)
-	{
-		for(TrainingImage image: images)
-			train(image);
+		for(TrainingVector tVec : vectors)
+		{
+			System.out.println(tVec.isPositive() + " Area: " + tVec.getVector()[0] );
+		}
 	}
 }

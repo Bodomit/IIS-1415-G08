@@ -16,6 +16,7 @@ public class AIRSystem {
 	private PreProcessor pre;
 	private PostProcessor post;
 	private Segmenter seg;
+	private FeatureExtractor feature;
 	private Classifier classifier;
 	
 	public AIRSystem()
@@ -23,6 +24,7 @@ public class AIRSystem {
 		pre = new PreProcessor();
 		post = new PostProcessor();
 		seg = new Segmenter();
+		feature = new FeatureExtractor();
 		classifier = new Classifier();
 	}
 	
@@ -34,6 +36,7 @@ public class AIRSystem {
 	{
 		// Load the images.
 		ArrayList<TrainingImage> images = getTrainingImages(directory);
+		ArrayList<TrainingVector> vectors = new ArrayList<TrainingVector>();
 		
 		// Process each image.
 		for(TrainingImage image: images)
@@ -46,9 +49,13 @@ public class AIRSystem {
 			processedImage = seg.segment(processedImage);
 			processedImage = post.process(processedImage);
 			
-			// Train the classifier using the image.
-			classifier.train(new TrainingImage(processedImage, image.isPositive(), image.getFileName()));
+			// Extract the features.
+			TrainingVector tVec = feature.extract(new TrainingImage(processedImage, image.isPositive(), image.getFileName()));
+			vectors.add(tVec);
 		}
+		
+		// Train the classifier with the vectors.
+		classifier.train(vectors);
 	}
 	
 	/**
