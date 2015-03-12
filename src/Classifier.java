@@ -13,8 +13,12 @@ public class Classifier
 	private final int C;
 	
 	private int n, m;
+	private double b;
+	private double[] W;
+	double[][] K;
 	private double[] trainingset_feature_mean;
 	private double[] trainingset_feature_range;
+	private double[] alphas = new double[m];
 	
 	public Classifier()
 	{
@@ -45,12 +49,94 @@ public class Classifier
 				X[i][j] = scaledVectors.get(i).getVector()[j];
 		}
 		
-		double[][] K = calculateKernalMatrix_Linear(X);
+		// Get the kernal matrix.
+		K = calculateKernalMatrix_Linear(X);
 		
+		// Store E;
+		double[] E = new double[m];
 		
+		// Start the training.
+		int passNum = 0;
+		int numberOfChangedAlphas = 0;
+		while(passNum < NUMBER_OF_PASSES)
+		{
+			for(int i = 0; i < m; i++)
+			{
+				// Calculate E_i
+				E[i] = calculateE_i(i, X, Y);
+				
+				if((Y[i] * E[i] < -TOLERANCE && alphas[i] < C) || (Y[i]*E[i] > TOLERANCE && alphas[i] > 0))
+				{
+					// Get j randomly, but make sure that it does not equal i.
+					int j;
+					do{ 
+						j = (int) Math.floor(m * Math.random());
+					}
+					while(i == j);
+					
+					// Calculate E_j.
+					E[j] = calculateE_i(j, X, Y);
+					
+					// Save the old alphas.
+					double alpha_i_old = alphas[i];
+					double alpha_j_old = alphas[j];
+					
+					// Calculate L and H.
+					double L = Math.max(0, alphas[j] - alphas[i]);
+					double H = Math.max(C, C + alphas[j] - alphas[i]);
+					
+					// If L == H then continue to the next i.
+					if(L == H)
+						continue;
+					
+					// Calculate eta.
+					double eta = 2 * K[i][j] - K[i][i] - K[j][j];
+					
+					if(eta > 1)
+						continue;
+					
+					// Compute new value for alpha j.
+					alphas[j] = alphas[j] - (Y[j] * (E[i] - E[j])) / eta;
+					
+					// Clip the new value.
+					alphas[j] = Math.min(H, alphas[j]);
+					alphas[j] = Math.max(L, alphas[j]);
+					
+					// Check if the change in alpha is significant.
+					if(Math.abs(alphas[j] - alpha_j_old) < TOLERANCE)
+					{
+						alphas[j] = alpha_j_old;
+						continue;
+					}
+					
+					// Compute b1 and b2.
+					double b1 = b - E[i] - Y[i] * (alphas[i] - alpha_i_old) * K[i][j]
+										 - Y[j] * (alphas[j] - alpha_j_old) * K[i][j];
+					
+					double b2 = b - E[i] - Y[i] * (alphas[i] - alpha_i_old) * K[i][j]
+							 			 - Y[j] * (alphas[j] - alpha_j_old) * K[j][j];
+					
+					// Select b.
+					if(0 < alphas[i] && alphas[i] < C)
+						b = b1;
+					else if (0 < alphas[j] && alphas[j] < C)
+						b = b2;
+					else
+						b = (b1+b2)/2;
+					
+					numberOfChangedAlphas++;
+				}
+			}
+			
+			if(numberOfChangedAlphas == 0)
+				passNum++;
+			else
+				passNum = 0;
+		}
 		
+		System.out.println("Done...");
 	}
-	
+
 	/**
 	 * Sets the scaling vectors based on the training example.
 	 * @param vectors The training vectors.
@@ -143,4 +229,31 @@ public class Classifier
 		
 		return x_prime;
 	}
+	
+	private double  calculateE_i(int i, double[][] X, double[] Y)
+	{
+		double E_i;
+		double[] K_i = getMatrixColumn(K, i);
+		
+		double sum = 0;
+		for(int j = 0; j < alphas.length; j++)
+		{
+			sum += alphas[j] * Y[j] * K_i[j];
+		}		
+		
+		E_i = sum - Y[i];
+		
+		return E_i;
+	}
+	
+	private double[] getMatrixColumn(double[][] X, int i)
+	{
+		double[] X_ci = new double[X.length];
+		
+		for(int j = 0; j < X_ci.length; j++)
+			X_ci[j] = X[j][i];
+		
+		return X_ci;
+	}
+
 }
