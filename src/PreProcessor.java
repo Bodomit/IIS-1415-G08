@@ -50,10 +50,10 @@ public class PreProcessor
 	}
 	
     
-    private BufferedImage reduceNoiseReductionbyMedian(BufferedImage source)
+    private BufferedImage reduceNoiseReductionbyMedian(BufferedImage image)
     {
     	//return noise reduce image.
-    	return ImageOp.median(source, 2);
+    	return ImageOp.median(image, 2);
     }
 
 	private BufferedImage enhanceContrast_LinearStretch(BufferedImage image, float m, float c)
@@ -67,16 +67,18 @@ public class PreProcessor
 		return ImageOp.pixelop(image, LUT);
 	}
 	
-	public BufferedImage enhanceContrast_PowerLaw(BufferedImage image)
-	{
-		// Create the lookup table.
-		short[] lut = new short[256];
+	private short[] powerLawLut(double gamma)
+    {
+    	short[] lut = new short[256];
 		for(int i = 0; i < lut.length; i++)
 		{
 			lut[i] = (short) (Math.pow(i,gamma)/ Math.pow(255,gamma-1));
 		}
-		
-		// Return the processed image.
-		return ImageOp.pixelop(image, LUT);
+		return lut;
+    }
+    
+    private BufferedImage enhanceContrast_PowerLaw(BufferedImage image)
+	{
+		return ImageOp.pixelop(image,powerLawLut(0.8));
 	}
 }

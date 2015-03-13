@@ -13,7 +13,7 @@ public class PostProcessor
 	}
 	
     
-    private BufferedImage manualThresholdAnImage(BufferedImage image)
+	private short[] thresholdLut(int t)
     {
     	short[] lut = new short[256];
 		for(int i = 0; i < (short)lut.length; i++)
@@ -23,8 +23,12 @@ public class PostProcessor
 			else
 				lut[i]= 0;
 		}
-		
-    	return ImageOp.pixelop(image, lut);
+		return lut;
+    }
+    
+    private BufferedImage thresholdAnImage(BufferedImage image)
+    {
+    	return ImageOp.pixelop(image, thresholdLut(50));
     }
     
     private BufferedImage open(BufferedImage image, int m)
