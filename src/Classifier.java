@@ -8,28 +8,30 @@ import java.util.Arrays;
  */
 public class Classifier implements IClassifier
 {
-	private final double TOLERANCE = 0.001;
+	private final double TOLERANCE = 0.00000001;
 	private final int NUMBER_OF_PASSES = 20;
-	private final int C;
+	private final int C = 1;
 	
 	private int n, m;
 	private double b;
 	private double[] W;
-	double[][] K;
+	private double[][] K;
 	private double[] trainingset_feature_mean;
 	private double[] trainingset_feature_range;
-	private double[] alphas = new double[m];
+	private double[] alphas;
 	
 	public Classifier()
 	{
-		C = 1000;
 	}
 	
 	public void train(ArrayList<TrainingVector> vectors)
 	{
+		System.out.print("\nTraining the classifier...");
+		
 		// Get the number of features.
 		n = vectors.get(0).getVector().length;
 		m = vectors.size();
+		alphas = new double[m];
 		
 		// Set the scaling vectors.
 		setScalingVectors(vectors);
@@ -43,7 +45,7 @@ public class Classifier implements IClassifier
 		
 		for(int i = 0; i < m; i++)
 		{
-			Y[i] = scaledVectors.get(i).isPositive() ? 1 : 0;
+			Y[i] = scaledVectors.get(i).isPositive() ? 1 : -1;
 			
 			for(int j = 0; j < n; j++)
 				X[i][j] = scaledVectors.get(i).getVector()[j];
@@ -57,20 +59,22 @@ public class Classifier implements IClassifier
 		
 		// Start the training.
 		int passNum = 0;
-		int numberOfChangedAlphas = 0;
+		
 		while(passNum < NUMBER_OF_PASSES)
-		{
+		{		
+			int numberOfChangedAlphas = 0;
 			for(int i = 0; i < m; i++)
 			{
 				// Calculate E_i
 				E[i] = calculateE_i(i, X, Y);
-				
+
 				if((Y[i] * E[i] < -TOLERANCE && alphas[i] < C) || (Y[i]*E[i] > TOLERANCE && alphas[i] > 0))
 				{
 					// Get j randomly, but make sure that it does not equal i.
 					int j;
 					do{ 
-						j = (int) Math.floor(m * Math.random());
+						//j = (i + 1) % m;
+						j = (int) Math.ceil(m * Math.random()) - 1;
 					}
 					while(i == j);
 					
@@ -81,9 +85,18 @@ public class Classifier implements IClassifier
 					double alpha_i_old = alphas[i];
 					double alpha_j_old = alphas[j];
 					
-					// Calculate L and H.
-					double L = Math.max(0, alphas[j] - alphas[i]);
-					double H = Math.max(C, C + alphas[j] - alphas[i]);
+					// Calculate the bounds L and H.
+					double L,H;
+					if(Y[i] == Y[j])
+					{
+						L = Math.max(0, alphas[j] + alphas[i] - C);
+						H = Math.min(C, alphas[j] + alphas[i]);
+					}
+					else
+					{
+						L = Math.max(0, alphas[j] - alphas[i]);
+						H = Math.min(C, C + alphas[j] - alphas[i]);
+					}
 					
 					// If L == H then continue to the next i.
 					if(L == H)
@@ -91,8 +104,7 @@ public class Classifier implements IClassifier
 					
 					// Calculate eta.
 					double eta = 2 * K[i][j] - K[i][i] - K[j][j];
-					
-					if(eta > 1)
+					if(eta >= 0)
 						continue;
 					
 					// Compute new value for alpha j.
@@ -109,11 +121,14 @@ public class Classifier implements IClassifier
 						continue;
 					}
 					
+					// Calculate alpha_i.
+					alphas[i] = alphas[i] + Y[i]*Y[j]*(alpha_j_old - alphas[j]);
+					
 					// Compute b1 and b2.
 					double b1 = b - E[i] - Y[i] * (alphas[i] - alpha_i_old) * K[i][j]
 										 - Y[j] * (alphas[j] - alpha_j_old) * K[i][j];
 					
-					double b2 = b - E[i] - Y[i] * (alphas[i] - alpha_i_old) * K[i][j]
+					double b2 = b - E[j] - Y[i] * (alphas[i] - alpha_i_old) * K[i][j]
 							 			 - Y[j] * (alphas[j] - alpha_j_old) * K[j][j];
 					
 					// Select b.
@@ -123,8 +138,9 @@ public class Classifier implements IClassifier
 						b = b2;
 					else
 						b = (b1+b2)/2;
-					
+	
 					numberOfChangedAlphas++;
+					System.out.print(".");
 				}
 			}
 			
@@ -134,7 +150,21 @@ public class Classifier implements IClassifier
 				passNum = 0;
 		}
 		
-		System.out.println("Done...");
+		// Calculate the weights.
+		W = calculateWeights(X, Y);
+		
+		System.out.println("\nDone!");
+	}
+
+	private double[] calculateWeights(double[][] X, double[] Y) 
+	{
+		double[] temp = new double[alphas.length]; 
+		for(int i = 0; i < alphas.length; i++)
+		{
+			temp[i] = alphas[i] * Y[i];
+		}
+		
+		return matrixMultiplication(temp, X);
 	}
 
 	/**
@@ -219,6 +249,22 @@ public class Classifier implements IClassifier
 		return c;
 	}
 	
+	private double[] matrixMultiplication(double[] A, double[][] B) 
+	{
+		if(A.length != B.length)
+			throw new IllegalArgumentException("Not valid matrix dimensions to multiply.");
+		
+		// Initialise the result matrix.
+		double[] c = new double[B[0].length];
+		
+		// Populate the result matrix.
+		for(int i = 0; i < B[0].length; i++)
+			for(int j = 0; j < A.length; j++)
+				c[i] += A[j] * B[j][i];
+		
+		return c;
+	}
+	
 	private double[][] matrixRotation(double[][] X)
 	{
 		double[][] x_prime = new double[X[0].length][X.length];
@@ -232,7 +278,6 @@ public class Classifier implements IClassifier
 	
 	private double  calculateE_i(int i, double[][] X, double[] Y)
 	{
-		double E_i;
 		double[] K_i = getMatrixColumn(K, i);
 		
 		double sum = 0;
@@ -241,9 +286,7 @@ public class Classifier implements IClassifier
 			sum += alphas[j] * Y[j] * K_i[j];
 		}		
 		
-		E_i = sum - Y[i];
-		
-		return E_i;
+		return b + sum - Y[i];
 	}
 	
 	private double[] getMatrixColumn(double[][] X, int i)

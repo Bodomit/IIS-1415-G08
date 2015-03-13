@@ -11,10 +11,11 @@ public class FeatureExtractor {
 	public TrainingVector extract(TrainingImage image)
 	{
 		// Get the empty vector.
-		double[] vector = new double[1];
+		double[] vector = new double[2];
 		
 		// Get the area.
 		vector[0] = getArea(image.getImage());
+		vector[1] = Math.pow(getArea(image.getImage()), 2);
 		
 		return new TrainingVector(image.isPositive(), vector);
 	}

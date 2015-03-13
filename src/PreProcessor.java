@@ -19,8 +19,6 @@ public class PreProcessor
 		// Reduce noise by Covolver or Median.
 		processedImage = reduceNoisebyConvolver(processedImage);
 		
-		
-		
 		// Return the processed image.
 		return processedImage;
 	}
