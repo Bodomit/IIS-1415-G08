@@ -17,7 +17,7 @@ public class AIRSystem {
 	private PostProcessor post;
 	private Segmenter seg;
 	private FeatureExtractor feature;
-	private Classifier classifier;
+	private IClassifier classifier;
 	
 	public AIRSystem()
 	{

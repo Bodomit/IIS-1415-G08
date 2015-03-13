@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author Bodomite
  *
  */
-public class Classifier 
+public class Classifier implements IClassifier
 {
 	private final double TOLERANCE = 0.001;
 	private final int NUMBER_OF_PASSES = 20;
@@ -254,6 +254,11 @@ public class Classifier
 			X_ci[j] = X[j][i];
 		
 		return X_ci;
+	}
+
+	@Override
+	public boolean predict(double[][] vector) {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 }
