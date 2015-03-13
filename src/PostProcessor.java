@@ -12,7 +12,7 @@ public class PostProcessor
 		return image;
 	}
 	
-    
+	// Create the lookup table.
 	private short[] thresholdLut(int t)
     {
     	short[] lut = new short[256];
@@ -25,7 +25,8 @@ public class PostProcessor
 		}
 		return lut;
     }
-    
+	
+	// Return the processed image.
     private BufferedImage thresholdAnImage(BufferedImage image)
     {
     	return ImageOp.pixelop(image, thresholdLut(50));

@@ -67,6 +67,7 @@ public class PreProcessor
 		return ImageOp.pixelop(image, LUT);
 	}
 	
+	// Create the lookup table.
 	private short[] powerLawLut(double gamma)
     {
     	short[] lut = new short[256];
@@ -77,6 +78,7 @@ public class PreProcessor
 		return lut;
     }
     
+	// Return the processed image.
     private BufferedImage enhanceContrast_PowerLaw(BufferedImage image)
 	{
 		return ImageOp.pixelop(image,powerLawLut(0.8));
