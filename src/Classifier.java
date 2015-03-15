@@ -298,6 +298,26 @@ public class Classifier implements IClassifier
 		
 		return X_ci;
 	}
+	
+	
+//	private double [] nearestNeighbour (ArrayList vectors)
+//	{
+//		double v1 = 0,v2 = 0,v3 = 0;
+//		double [] nearestN = {v1,v2,v3};
+//		
+//		double a=0,b=0;
+//		double [] vt = {a,b};
+//		
+//		for(int i = 0; i< vectors.size(); i++)
+//		{
+//			a = a + vectors.get(i)[0];
+//		}
+//		
+//		return nearestN;
+//		
+//	}
+	
+	
 
 	@Override
 	public boolean predict(double[][] vector) {

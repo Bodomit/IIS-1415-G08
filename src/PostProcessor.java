@@ -32,6 +32,16 @@ public class PostProcessor
     	return ImageOp.pixelop(image, thresholdLut(50));
     }
     
+    private BufferedImage erosion(BufferedImage image)
+    {
+    	return image;
+    }
+    
+    private BufferedImage dilation(BufferedImage image)
+    {
+    	return image;
+    }
+    
     private BufferedImage open(BufferedImage image, int m)
     {
     	// m is mask size.
