@@ -11,26 +11,6 @@ public class PostProcessor
 	{
 		return image;
 	}
-	
-	// Create the lookup table.
-	private short[] thresholdLut(int t)
-    {
-    	short[] lut = new short[256];
-		for(int i = 0; i < (short)lut.length; i++)
-		{
-			if(i <= t)
-				lut[i] = 255;
-			else
-				lut[i]= 0;
-		}
-		return lut;
-    }
-	
-	// Return the processed image.
-    private BufferedImage thresholdAnImage(BufferedImage image)
-    {
-    	return ImageOp.pixelop(image, thresholdLut(50));
-    }
     
     private BufferedImage erosion(BufferedImage image)
     {
