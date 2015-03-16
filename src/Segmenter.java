@@ -1,4 +1,5 @@
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 
 
 public class Segmenter 
@@ -19,6 +20,11 @@ public class Segmenter
 		return ImageOp.pixelop(image, MANUAL_THRESHOLDING_LUT);
 	}
 	
+	private BufferedImage segmentBrightnessAutomatic(BufferedImage image)
+	{
+		return image;
+	}
+	
 	private BufferedImage segment_edge(BufferedImage image)
 	{
 		return image;
@@ -37,5 +43,44 @@ public class Segmenter
 		}
 		return lut;
     }
+	
+	// calculate the mean grey level of the image 
+	private int mean(BufferedImage image)
+	{
+		int width = image.getWidth();
+		int height = image.getHeight();
+		Raster rast = image.getRaster();
+		int sum = 0;
+		
+		for(int i =0; i<height; i++)
+		{
+			for(int j = 0; j<width; j++)
+			{
+				sum += rast.getSample(j, i, 0);
+			}
+		}
+		
+		return sum/(width*height);
+	}
+	
+	// calculate the standard deviation 
+	public int standardDeviation(BufferedImage image)
+	{
+		int width = image.getWidth();
+		int height = image.getHeight();
+		Raster rast = image.getRaster();
+		
+		int sum =0;
+		
+		for(int i = 0; i<height; i++)
+		{
+			for(int j =0; j<width; j++)
+			{
+				sum += Math.pow(rast.getSample(j, i, 0) - mean(image), 2);
+			}
+		}
+		
+		return (int)Math.sqrt(sum/(width*(height-1)));
+	}
 	
 }
