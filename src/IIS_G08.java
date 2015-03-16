@@ -20,7 +20,9 @@ public class IIS_G08 {
 		
 		// Train the system using the training image set.
 		airs.train(props.getProperty("trainingPath"));
-
+		
+		// Classify all the test images.
+		airs.classifyAllInFolder(props.getProperty("testingPath"));
 	}
 	
 	/**
