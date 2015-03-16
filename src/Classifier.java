@@ -310,7 +310,11 @@ public class Classifier implements IClassifier
 		return X_ci;
 	}
 	
-	public boolean predict(double[] vector) {
+	public boolean predictSVM(double[] vector) {
 		return matrixMultiplication(vector, W) + b > 0 ? true : false;
+	}
+	public boolean predictN(ArrayList<TrainingVector> vector)
+	{
+		return false;
 	}
 }

@@ -79,7 +79,7 @@ public class AIRSystem {
 		double[] featureVector = feature.extract(image);
 		
 		// Classify the image.
-		return classifier.predict(featureVector);
+		return classifier.predictSVM(featureVector);
 	}
 	
 	public void classifyAllInFolder(File directory)
