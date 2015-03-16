@@ -13,12 +13,14 @@ public class PreProcessor
 	{
 		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = 5;
 		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT = 10;
+	    BRIGHTNESS_MODIFIER = 30;
 	}
 	
-	public PreProcessor(int linearStrechMinimumPeakWidth, int linearStrechMinimumPeakHeight)
+	public PreProcessor(int linearStrechMinimumPeakWidth, int linearStrechMinimumPeakHeight, int brightnessModifier)
 	{
 		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = linearStrechMinimumPeakWidth;
 		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT =linearStrechMinimumPeakHeight;
+		BRIGHTNESS_MODIFIER = brightnessModifier;
 	}
 
 	public BufferedImage process(BufferedImage image)
