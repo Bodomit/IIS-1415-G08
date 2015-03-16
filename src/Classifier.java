@@ -8,7 +8,7 @@ import java.util.Arrays;
  */
 public class Classifier implements IClassifier
 {
-	private final double TOLERANCE = 0.00000001;
+	private final double TOLERANCE = 0.001;
 	private final int NUMBER_OF_PASSES = 20;
 	private final int C = 1;
 	
@@ -153,7 +153,7 @@ public class Classifier implements IClassifier
 		// Calculate the weights.
 		W = calculateWeights(X, Y);
 		
-		System.out.println("\nDone!");
+		System.out.println("\nTraining Complete!");
 	}
 
 	private double[] calculateWeights(double[][] X, double[] Y) 
@@ -265,6 +265,17 @@ public class Classifier implements IClassifier
 		return c;
 	}
 	
+	private double matrixMultiplication(double[] A, double[] B) {
+		if(A.length != B.length)
+			throw new IllegalArgumentException("Not valid matrix dimensions to multiply.");
+		
+		double sum = 0;
+		for(int i = 0; i < A.length; i++)
+			sum += A[i] * B[i];
+		
+		return sum;
+	}
+	
 	private double[][] matrixRotation(double[][] X)
 	{
 		double[][] x_prime = new double[X[0].length][X.length];
@@ -299,29 +310,7 @@ public class Classifier implements IClassifier
 		return X_ci;
 	}
 	
-	
-//	private double [] nearestNeighbour (ArrayList vectors)
-//	{
-//		double v1 = 0,v2 = 0,v3 = 0;
-//		double [] nearestN = {v1,v2,v3};
-//		
-//		double a=0,b=0;
-//		double [] vt = {a,b};
-//		
-//		for(int i = 0; i< vectors.size(); i++)
-//		{
-//			a = a + vectors.get(i)[0];
-//		}
-//		
-//		return nearestN;
-//		
-//	}
-	
-	
-
-	@Override
-	public boolean predict(double[][] vector) {
-		throw new UnsupportedOperationException("Not yet implemented");
+	public boolean predict(double[] vector) {
+		return matrixMultiplication(vector, W) + b > 0 ? true : false;
 	}
-
 }

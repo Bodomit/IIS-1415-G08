@@ -50,7 +50,7 @@ public class AIRSystem {
 			processedImage = post.process(processedImage);
 			
 			// Extract the features.
-			TrainingVector tVec = feature.extract(new TrainingImage(processedImage, image.isPositive(), image.getFileName()));
+			TrainingVector tVec = feature.extract(new TrainingImage(processedImage, image.isPositive()));
 			vectors.add(tVec);
 		}
 		
@@ -70,17 +70,73 @@ public class AIRSystem {
 	
 	public boolean classify(BufferedImage image)
 	{
-		throw new UnsupportedOperationException("Not yet implemented.");
+		// Process the image.
+		image = pre.process(image);
+		image = seg.segment(image);
+		image = post.process(image);
+		
+		// Get the feature vector.
+		double[] featureVector = feature.extract(image);
+		
+		// Classify the image.
+		return classifier.predict(featureVector);
 	}
 	
-	public Map<String, Boolean> classifyAllInFolder(File directory)
+	public void classifyAllInFolder(File directory)
 	{
-		throw new UnsupportedOperationException("Not yet implemented.");
+		System.out.println("Classifying: ");
+		
+		// Store the total number of images classified, and how many were classified accurately. 
+		int numImages = 0;
+		int numCorrectlyClassified = 0;
+		
+		try 
+		{
+			// Make sure the directory exists.
+			if(!directory.isDirectory())
+					throw new FileNotFoundException("The directory \"" + directory.getAbsolutePath() + "\" does not exist.");
+			
+			// Classify each image in the directory.
+			for(File imagePath : directory.listFiles())
+			{
+				// Get the image.
+				BufferedImage image = ImageOp.readInImage(imagePath.getAbsolutePath());
+				boolean isClassifiedGlaucoma = classify(image);
+				boolean isGlaucoma = imagePath.getName().contains("glaucoma");
+				
+				// Store and print the results.
+				numImages++;
+				String message = isClassifiedGlaucoma ? "Positive" : "Negative";
+				if((isClassifiedGlaucoma && isGlaucoma) || (!isClassifiedGlaucoma && !isGlaucoma))
+				{
+					message += " - Correctly Classified.";
+					numCorrectlyClassified++;
+				}
+				else
+				{
+					message += " - Incorrectly Classified.";
+				}
+				
+				// Output the result.
+				System.out.println(imagePath.getName() + ": " + message);
+			}
+			
+		} catch (FileNotFoundException e) 
+		{
+			System.err.println(e.getMessage());
+		}
+		
+		// Print out the accuracy.
+		System.out.printf("\n\nNumber of images: %d", numImages);
+		System.out.printf("\nNumber correctly classified: %d", numCorrectlyClassified);
+		System.out.printf("\nAccuracy: %.2f%%", numCorrectlyClassified * 100f / numImages);
+		
 	}
 	
-	public Map<String, Boolean> classifyAllInFolder(String directoryName)
+	public void classifyAllInFolder(String directoryName)
 	{
-		throw new UnsupportedOperationException("Not yet implemented.");
+		File directory = new File(directoryName.replace("\"", ""));
+		classifyAllInFolder(directory);
 	}
 	
 	/**
@@ -103,14 +159,14 @@ public class AIRSystem {
 				if(!image.isFile())
 					throw new FileNotFoundException(image.getName() + " does not exist.");
 				
-				boolean isGlaucoma = image.getName().contains("glaucoma") ? true : false;
+				boolean isGlaucoma = image.getName().contains("glaucoma");
 				BufferedImage img = ImageOp.readInImage(image.getAbsolutePath());
-				images.add(new TrainingImage(img, isGlaucoma, image.getName()));
+				images.add(new TrainingImage(img, isGlaucoma));
 			}
 		}
-		catch(Exception ex)
+		catch(FileNotFoundException e)
 		{
-			System.err.println(ex.getMessage());
+			System.err.println(e.getMessage());
 		}
 		
 		return images;

@@ -10,14 +10,23 @@ public class FeatureExtractor {
 	
 	public TrainingVector extract(TrainingImage image)
 	{
+		// Get the vector.
+		double[] vector = extract(image.getImage());
+		
+		// Wrap the vector along with whether it is positive or not.
+		return new TrainingVector(image.isPositive(), vector);
+	}
+	
+	public double[] extract(BufferedImage image)
+	{
 		// Get the empty vector.
 		double[] vector = new double[2];
+				
+		// Get the features.
+		vector[0] = getArea(image);
+		vector[1] = getPerimeter(image);
 		
-		// Get the area.
-		vector[0] = getArea(image.getImage());
-		vector[1] = getPerimeter(image.getImage());
-		
-		return new TrainingVector(image.isPositive(), vector);
+		return vector;
 	}
 	
 	private double getArea(BufferedImage image)

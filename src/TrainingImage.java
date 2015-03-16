@@ -4,12 +4,10 @@ import java.awt.image.BufferedImage;
 public class TrainingImage {
 	private final BufferedImage image;
 	private final boolean isPositive;
-	private final String fileName;
 	
-	public TrainingImage(BufferedImage image, boolean isPositive, String fileName) {
+	public TrainingImage(BufferedImage image, boolean isPositive) {
 		this.image = image;
 		this.isPositive = isPositive;
-		this.fileName = fileName;
 	}
 
 	public BufferedImage getImage() {
@@ -18,9 +16,5 @@ public class TrainingImage {
 
 	public boolean isPositive() {
 		return isPositive;
-	}
-	
-	public String getFileName() {
-		return fileName;
 	}
 }
