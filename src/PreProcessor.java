@@ -8,19 +8,22 @@ public class PreProcessor
 	private final int LINEAR_STRECTH_MINIMUM_PEAK_WIDTH;
 	private final int LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT;
 	private final int BRIGHTNESS_MODIFIER;
+	private final double GAMMA;
 	
 	public PreProcessor()
 	{
-		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = 5;
-		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT = 10;
+		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = 3;
+		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT = 5;
 	    BRIGHTNESS_MODIFIER = 30;
+	    GAMMA = 1.5;
 	}
 	
-	public PreProcessor(int linearStrechMinimumPeakWidth, int linearStrechMinimumPeakHeight, int brightnessModifier)
+	public PreProcessor(int linearStrechMinimumPeakWidth, int linearStrechMinimumPeakHeight, int brightnessModifier, double gamma)
 	{
 		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = linearStrechMinimumPeakWidth;
 		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT =linearStrechMinimumPeakHeight;
 		BRIGHTNESS_MODIFIER = brightnessModifier;
+		GAMMA = gamma;
 	}
 
 	public BufferedImage process(BufferedImage image)
@@ -33,7 +36,7 @@ public class PreProcessor
 		processedImage = enhanceContrast(processedImage);
 		
 		// Reduce noise by Covolver or Median.
-		processedImage = reduceNoisebyConvolver(processedImage);
+		//processedImage = reduceNoisebyConvolver(processedImage);
 		
 		// Return the processed image.
 		return processedImage;
@@ -62,6 +65,7 @@ public class PreProcessor
 	{
 		// Perform linear stretching.
 		return enhanceContrast_LinearStretch_Automated(image);
+		//return enhanceContrast_PowerLaw(image);
 	}
 	
 	private BufferedImage reduceNoisebyConvolver(BufferedImage image)
@@ -92,7 +96,7 @@ public class PreProcessor
     		int[] startEndLevels = getStartAndEndGrayLevels(image);
     		
     		// Translate the start and end levels into an unclipped transform function.
-    		double m = 255/ (startEndLevels[1] - startEndLevels[0]);
+    		double m = 255f/ (startEndLevels[1] - startEndLevels[0]);
     		double c = -m * startEndLevels[0];
     		
     		// Perform the linear stretch.
@@ -190,6 +194,6 @@ public class PreProcessor
 	// Return the processed image.
     private BufferedImage enhanceContrast_PowerLaw(BufferedImage image)
 	{
-		return ImageOp.pixelop(image,powerLawLut(0.8));
+		return ImageOp.pixelop(image,powerLawLut(GAMMA));
 	}
 }

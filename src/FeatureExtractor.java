@@ -20,11 +20,16 @@ public class FeatureExtractor {
 	public double[] extract(BufferedImage image)
 	{
 		// Get the empty vector.
-		double[] vector = new double[2];
-				
+		double[] vector = new double[5];
+		
+		double[] positionOfCentorid = position(image);
+		
 		// Get the features.
 		vector[0] = getArea(image);
 		vector[1] = getPerimeter(image);
+		vector[2] = compactness(image);
+		vector[3] = positionOfCentorid[0];
+		vector[4] = positionOfCentorid[1];
 		
 		return vector;
 	}

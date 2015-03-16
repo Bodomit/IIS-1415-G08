@@ -9,7 +9,8 @@ public class PostProcessor
 	
 	public BufferedImage process(BufferedImage image)
 	{
-		return image;
+		image = close(image, 3);
+		return open(image, 3);
 	}
     
     private BufferedImage erosion(BufferedImage image)
@@ -31,6 +32,6 @@ public class PostProcessor
     private BufferedImage close(BufferedImage image, int m)
     {
     	//m is mask size.
-    	return ImageOp.close(image, 3);
+    	return ImageOp.close(image, m);
     }
 }

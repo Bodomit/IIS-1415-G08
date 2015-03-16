@@ -7,12 +7,17 @@ public class Segmenter
 	private final short[] MANUAL_THRESHOLDING_LUT;
 	public Segmenter()
 	{
-		MANUAL_THRESHOLDING_LUT = thresholdLut(50);
+		MANUAL_THRESHOLDING_LUT = thresholdLut(115);
+	}
+	
+	public Segmenter(int threshold)
+	{
+		MANUAL_THRESHOLDING_LUT = thresholdLut(threshold);
 	}
 	
 	public BufferedImage segment(BufferedImage image)
 	{
-		return image;
+		return segment_brightness_manual(image);
 	}
 	
 	private BufferedImage segment_brightness_manual(BufferedImage image)
@@ -36,7 +41,7 @@ public class Segmenter
     	short[] lut = new short[256];
 		for(int i = 0; i < (short)lut.length; i++)
 		{
-			if(i <= t)
+			if(i >= t)
 				lut[i] = 255;
 			else
 				lut[i]= 0;
