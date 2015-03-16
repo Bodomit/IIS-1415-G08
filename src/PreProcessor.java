@@ -7,6 +7,7 @@ public class PreProcessor
 {
 	private final int LINEAR_STRECTH_MINIMUM_PEAK_WIDTH;
 	private final int LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT;
+	private final int BRIGHTNESS_MODIFIER;
 	
 	public PreProcessor()
 	{
@@ -35,10 +36,24 @@ public class PreProcessor
 		// Return the processed image.
 		return processedImage;
 	}
+	
+	
+	// create the look up table
+	public short[] brightnessLut(int c)
+	{
+		short[] data = new short[256];
+		
+		for (int i = 0; i<data.length; i++)
+		{
+			data[i] = (short)Math.max(Math.min(i + c,255),0);
+		}
+		
+		return data;
+	}
 
 	private BufferedImage enhanceBrightness(BufferedImage image)
 	{
-		return image;
+		return ImageOp.pixelop(image,brightnessLut(BRIGHTNESS_MODIFIER));
 	}
 
 	private BufferedImage enhanceContrast(BufferedImage image)
