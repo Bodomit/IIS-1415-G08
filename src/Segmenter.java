@@ -4,30 +4,32 @@ import java.awt.image.Raster;
 
 public class Segmenter 
 {
-	private final short[] MANUAL_THRESHOLDING_LUT;
+	
 	public Segmenter()
 	{
-		MANUAL_THRESHOLDING_LUT = thresholdLut(115);
+			
 	}
 	
 	public Segmenter(int threshold)
 	{
-		MANUAL_THRESHOLDING_LUT = thresholdLut(threshold);
+		
 	}
 	
 	public BufferedImage segment(BufferedImage image)
 	{
-		return segment_brightness_manual(image);
+		return segmentBrightnessAutomatic(image);
 	}
 	
-	private BufferedImage segment_brightness_manual(BufferedImage image)
+	private BufferedImage segment_brightness_manual(BufferedImage image, int threshold)
 	{
-		return ImageOp.pixelop(image, MANUAL_THRESHOLDING_LUT);
+		short[] LUT = thresholdLut(threshold);
+		return ImageOp.pixelop(image, LUT);
 	}
-	
+	// return the automatically segmented image
 	private BufferedImage segmentBrightnessAutomatic(BufferedImage image)
 	{
-		return image;
+		short[] LUT = performAutomaticThresholding(image);
+		return ImageOp.pixelop(image, LUT);
 	}
 	
 	private BufferedImage segment_edge(BufferedImage image)
@@ -69,7 +71,7 @@ public class Segmenter
 	}
 	
 	// calculate the standard deviation 
-	public int standardDeviation(BufferedImage image)
+	private int standardDeviation(BufferedImage image, double mean)
 	{
 		int width = image.getWidth();
 		int height = image.getHeight();
@@ -81,11 +83,20 @@ public class Segmenter
 		{
 			for(int j =0; j<width; j++)
 			{
-				sum += Math.pow(rast.getSample(j, i, 0) - mean(image), 2);
+				sum += Math.pow(rast.getSample(j, i, 0) - mean, 2);
 			}
 		}
 		
 		return (int)Math.sqrt(sum/(width*(height-1)));
+	}
+	
+	// perform automatic thresholding
+	private short[] performAutomaticThresholding(BufferedImage image)
+	{
+		double mean = mean(image);
+		int threshold = (int)Math.round(mean + standardDeviation(image, mean));
+		
+		return thresholdLut(threshold);
 	}
 	
 }
