@@ -35,8 +35,9 @@ public class PreProcessor
 		//processedImage = enhanceBrightness(processedImage);
 		processedImage = enhanceContrast(processedImage);
 		
-		// Reduce noise by Covolver or Median.
+		// Reduce noise by Convolver or Median.
 		//processedImage = reduceNoisebyConvolver(processedImage);
+		//processedImage = reduceNoiseByMedian(processedImage);
 		
 		// Return the processed image.
 		return processedImage;
@@ -64,8 +65,10 @@ public class PreProcessor
 	private BufferedImage enhanceContrast(BufferedImage image)
 	{
 		// Perform linear stretching.
+		
 		return enhanceContrast_LinearStretch_Automated(image);
 		//return enhanceContrast_PowerLaw(image);
+		// return enhanceContrast_HistogramEqualization(image)
 	}
 	
 	private BufferedImage reduceNoisebyConvolver(BufferedImage image)
@@ -82,7 +85,7 @@ public class PreProcessor
 	}
 	
     
-    private BufferedImage reduceNoiseReductionbyMedian(BufferedImage image)
+    private BufferedImage reduceNoiseByMedian(BufferedImage image)
     {
     	//return noise reduce image.
     	return ImageOp.median(image, 2);
@@ -196,4 +199,24 @@ public class PreProcessor
 	{
 		return ImageOp.pixelop(image,powerLawLut(GAMMA));
 	}
+    
+    // perform histogram equalisation
+    private short[] histogramEqualisationLut (Histogram hist) throws HistogramException
+	{
+		short [] outputData = new short [256];
+
+		for (int i = 0; i<outputData.length; i++)
+		{
+			outputData[i] = (short)Math.max(0,(256*hist.getCumulativeFrequency(i)/(hist.getNumSamples())-1));
+		}
+
+		return outputData;
+	}
+    
+    // enhance contrast via histogram equalisation
+    private BufferedImage enhanceContrast_HistogramEqualization(BufferedImage image) throws HistogramException
+    {
+    	Histogram histogram = new Histogram(image);
+    	return ImageOp.pixelop(image, histogramEqualisationLut(histogram));
+    }
 }
