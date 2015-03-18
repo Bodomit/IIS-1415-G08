@@ -25,7 +25,7 @@ public class AIRSystem {
 		post = new PostProcessor();
 		seg = new Segmenter();
 		feature = new FeatureExtractor();
-		classifier = new Classifier();
+		classifier = new ClassifierNearestNeighbour(3);
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class AIRSystem {
 		double[] featureVector = feature.extract(image);
 		
 		// Classify the image.
-		return classifier.predictSVM(featureVector);
+		return classifier.predict(featureVector);
 	}
 	
 	public void classifyAllInFolder(File directory)
