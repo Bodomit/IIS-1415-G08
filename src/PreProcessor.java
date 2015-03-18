@@ -36,7 +36,7 @@ public class PreProcessor
 		processedImage = enhanceContrast(processedImage);
 		
 		// Reduce noise by Convolver or Median.
-		//processedImage = reduceNoisebyConvolver(processedImage);
+		processedImage = reduceNoisebyConvolver(processedImage);
 		//processedImage = reduceNoiseByMedian(processedImage);
 		
 		// Return the processed image.

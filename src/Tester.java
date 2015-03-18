@@ -18,11 +18,11 @@ public class Tester {
 			JVision jV = new JVision();
 			jV.setSize(1200, 750);
 			pre = new PreProcessor();
-			seg = new Segmenter();
+			seg = new Segmenter(1.25);
 			post = new PostProcessor();
 
 			// Get an image.
-			String path = "C:\\Users\\Bodomite\\Documents\\GitHub\\IIS-1415-G08\\Datasets\\crop\\training\\glaucoma5_crop.jpg";
+			String path = "C:\\Users\\40057686\\Desktop\\IIS-1415-G08.git\\trunk\\Datasets\\crop\\training\\healthy4_crop.jpg";
 
 			BufferedImage image = ImageOp.readInImage(path);
 			jV.imdisp(image, "Orginal", 50, 20);

@@ -4,15 +4,11 @@ import java.awt.image.Raster;
 
 public class Segmenter 
 {
+	private final double ALPHA;
 	
-	public Segmenter()
+	public Segmenter(double alpha)
 	{
-			
-	}
-	
-	public Segmenter(int threshold)
-	{
-		
+		ALPHA = alpha;
 	}
 	
 	public BufferedImage segment(BufferedImage image)
@@ -94,7 +90,7 @@ public class Segmenter
 	private short[] performAutomaticThresholding(BufferedImage image)
 	{
 		double mean = mean(image);
-		int threshold = (int)Math.round(mean + standardDeviation(image, mean));
+		int threshold = (int)Math.round(mean + ALPHA * standardDeviation(image, mean));
 		
 		return thresholdLut(threshold);
 	}

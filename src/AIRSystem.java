@@ -23,7 +23,7 @@ public class AIRSystem {
 	{
 		pre = new PreProcessor();
 		post = new PostProcessor();
-		seg = new Segmenter();
+		seg = new Segmenter(1.25);
 		feature = new FeatureExtractor();
 		classifier = new ClassifierNearestNeighbour(3);
 	}

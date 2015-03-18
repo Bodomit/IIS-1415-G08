@@ -75,9 +75,6 @@ public class ClassifierNearestNeighbour implements IClassifier {
 		for(int i = 0; i < K; i++)
 			sum += trainingVectorClasses[sortedDistanceIndexs[i]] ? 1 : -1;
 		
-		return sum > 0 ? true : false;
+		return sum >= 0 ? true : false;
 	}
-	
-	
-
 }

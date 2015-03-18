@@ -3,13 +3,14 @@ import java.util.Arrays;
 
 /**
  * The classifier implements an SVM using a linear kernal function.
+ * It was ported from an Octave function given on the Coursera Course
  * @author Bodomite
  *
  */
 public class Classifier implements IClassifier
 {
-	private final double TOLERANCE = 0.001;
-	private final int NUMBER_OF_PASSES = 20;
+	private final double TOLERANCE = 0.00001;
+	private final int NUMBER_OF_PASSES = 50;
 	private final int C = 1;
 	
 	private int n, m;
