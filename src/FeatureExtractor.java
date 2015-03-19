@@ -63,16 +63,11 @@ public class FeatureExtractor {
 		double [] Cij = {i, j};
 		
 		return Cij;
-		
 	}
 	
 	private double getPerimeter(BufferedImage image)
 	{
-		float [] mask3X3 = {1,1,1,
-							1,1,1,
-							1,1,1};		
-		
-		return getArea(image) - getArea(ImageOp.convolver(image,mask3X3));
+		return getArea(image) - getArea(PostProcessor.erode(image));
 	}
 	
 	private double compactness(BufferedImage image)
