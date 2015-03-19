@@ -29,11 +29,11 @@ public class Segmenter
 		return ImageOp.pixelop(image, LUT);
 	}
 	
-	/*private BufferedImage segment_edge(BufferedImage image)
+	private BufferedImage segment_edge(BufferedImage image)
 	{
 		
 		return segmentBrightnessAutomatic(performEdgeExtraction(image));
-	}*/
+	}
 	
 	// Create the lookup table.
 	private short[] thresholdLut(int t)
@@ -98,11 +98,11 @@ public class Segmenter
 	}
 	
 	// perform edge extraction using sobel 
-	/*public BufferedImage performEdgeExtraction(BufferedImage image)
+	public BufferedImage performEdgeExtraction(BufferedImage image)
 	{
 		final float[] SOBELJ3X3 = {-1.f,0.f,1.f,
-       	       -2.f,0.f,2f,
-       	       -1f,0f,1f};
+       	       -2.f,0.f,2.f,
+       	       -1.f,0.f,1.f};
 
 		BufferedImage imageOne = ImageOp.convolver(image, SOBELJ3X3);
 
@@ -113,6 +113,40 @@ public class Segmenter
 		BufferedImage imageTwo = ImageOp.convolver(image, SOBELI3X3);
 
 		return ImageOp.imagrad(imageOne, imageTwo);
-	}*/
+	}
 	
+	
+	// perform edge extraction using Prewitt 
+	/*public BufferedImage performEdgeExtraction(BufferedImage image)
+		{
+			final float[] PREWJ3X3 = {-1.f,0.f,1.f,
+	       	       -1.f,0.f,1.f,
+	       	       -1.f,0.f,1.f};
+
+			BufferedImage imageOne = ImageOp.convolver(image, PREWJ3X3);
+
+			final float[] PREWI3X3 = {-1.f,-1.f,-1.f,
+				      0.f,0.f,0.f,
+				      1.f,1.f,1.f};
+
+			BufferedImage imageTwo = ImageOp.convolver(image, PREWI3X3);
+
+			return ImageOp.imagrad(imageOne, imageTwo);
+		}*/
+	
+	// perform edge extraction using Robert 
+		/*public BufferedImage performEdgeExtraction(BufferedImage image)
+			{
+				final float[] ROBJ2X2 = {-1.f,0.f,
+		       	       0.f,-1.f};
+
+				BufferedImage imageOne = ImageOp.convolver(image, ROBJ2X2);
+
+				final float[] 	ROBI2X2 = {0.f,1.f,
+					      -1.f,0.f};
+
+				BufferedImage imageTwo = ImageOp.convolver(image, ROBI2X2);
+
+				return ImageOp.imagrad(imageOne, imageTwo);
+			}*/
 }
