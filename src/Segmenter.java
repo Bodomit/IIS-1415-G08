@@ -14,6 +14,7 @@ public class Segmenter
 	public BufferedImage segment(BufferedImage image)
 	{
 		return segmentBrightnessAutomatic(image);
+		//return segment_edge(image);
 	}
 	
 	private BufferedImage segment_brightness_manual(BufferedImage image, int threshold)
@@ -28,10 +29,11 @@ public class Segmenter
 		return ImageOp.pixelop(image, LUT);
 	}
 	
-	private BufferedImage segment_edge(BufferedImage image)
+	/*private BufferedImage segment_edge(BufferedImage image)
 	{
-		return image;
-	}
+		
+		return segmentBrightnessAutomatic(performEdgeExtraction(image));
+	}*/
 	
 	// Create the lookup table.
 	private short[] thresholdLut(int t)
@@ -94,5 +96,23 @@ public class Segmenter
 		
 		return thresholdLut(threshold);
 	}
+	
+	// perform edge extraction using sobel 
+	/*public BufferedImage performEdgeExtraction(BufferedImage image)
+	{
+		final float[] SOBELJ3X3 = {-1.f,0.f,1.f,
+       	       -2.f,0.f,2f,
+       	       -1f,0f,1f};
+
+		BufferedImage imageOne = ImageOp.convolver(image, SOBELJ3X3);
+
+		final float[] SOBELI3X3 = {-1.f,-2.f,-1.f,
+			      0.f,0.f,0.f,
+			      1.f,2.f,1.f};
+
+		BufferedImage imageTwo = ImageOp.convolver(image, SOBELI3X3);
+
+		return ImageOp.imagrad(imageOne, imageTwo);
+	}*/
 	
 }
