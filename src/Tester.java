@@ -19,12 +19,12 @@ public class Tester {
 			JVision jV = new JVision();
 			jV.setSize(1200, 750);
 			pre = new PreProcessor();
-			seg = new Segmenter(1.25);
+			seg = new Segmenter(1.1);
 			post = new PostProcessor();
 			fE = new FeatureExtractor();
 
 			// Get an image.
-			String path = "C:\\Users\\40057686\\Desktop\\IIS-1415-G08.git\\trunk\\Datasets\\crop\\training\\glaucoma6_crop.jpg";
+			String path = "C:\\Users\\Bodomite\\Desktop\\IIS-1415-G08.git\\trunk\\Datasets\\crop\\training\\glaucoma5_crop.jpg";
 
 			BufferedImage image = ImageOp.readInImage(path);
 			jV.imdisp(image, "Orginal", 50, 20);
@@ -41,10 +41,8 @@ public class Tester {
 			
 			image = seg.segment(image);
 			jV.imdisp(image, "Segmented", 740, 20);
-			System.out.println(fE.getArea(image));
 			
 			image = post.process(image);
-			System.out.println(fE.getArea(image));
 			jV.imdisp(image, "Post-Processed", 740, 370);	
 		}
 		catch(Exception e)

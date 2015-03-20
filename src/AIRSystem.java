@@ -23,7 +23,7 @@ public class AIRSystem {
 	{
 		pre = new PreProcessor();
 		post = new PostProcessor();
-		seg = new Segmenter(1.25);
+		seg = new Segmenter(1.1);
 		feature = new FeatureExtractor();
 		classifier = new ClassifierNearestNeighbour(3);
 	}
@@ -53,6 +53,17 @@ public class AIRSystem {
 			TrainingVector tVec = feature.extract(new TrainingImage(processedImage, image.isPositive()));
 			vectors.add(tVec);
 		}
+		
+		System.out.println("The Training vectors: ");
+		for(int i = 0; i < vectors.size(); i++)
+		{
+			System.out.printf("%-9s: ", vectors.get(i).isPositive() ? "Glaucoma" : "Healthy");
+			for(int j = 0; j < vectors.get(0).getVector().length; j++)
+				System.out.printf("%9.2f, ", vectors.get(i).getVector()[j]);
+			
+			System.out.println();
+		}
+		System.out.println();
 		
 		// Train the classifier with the vectors.
 		classifier.train(vectors);

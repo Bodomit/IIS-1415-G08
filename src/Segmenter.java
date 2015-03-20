@@ -13,8 +13,8 @@ public class Segmenter
 	
 	public BufferedImage segment(BufferedImage image)
 	{
-		return segmentBrightnessAutomatic(image);
-		//return segment_edge(image);
+		//return segmentBrightnessAutomatic(image);
+		return segment_edge(image);
 	}
 	
 	private BufferedImage segment_brightness_manual(BufferedImage image, int threshold)
@@ -31,7 +31,6 @@ public class Segmenter
 	
 	private BufferedImage segment_edge(BufferedImage image)
 	{
-		
 		return segmentBrightnessAutomatic(performEdgeExtraction(image));
 	}
 	
