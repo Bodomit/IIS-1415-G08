@@ -16,7 +16,7 @@ public class ClassifierNearestNeighbour implements IClassifier {
 	}
 	
 	@Override
-	public void train(ArrayList<TrainingVector> vectors) 
+	public void train(ArrayList<TrainingVector> vectors, boolean isVerbose) 
 	{
 		// Store the vectors.
 		trainingVectors = new double[vectors.size()][vectors.get(0).getVector().length];

@@ -19,10 +19,10 @@ public class IIS_G08 {
 		AIRSystem airs = new AIRSystem();
 		
 		// Train the system using the training image set.
-		airs.train(props.getProperty("trainingPath"));
+		airs.train(props.getProperty("trainingPath"), true);
 		
 		// Classify all the test images.
-		airs.classifyAllInFolder(props.getProperty("testingPath"));
+		airs.classifyAllInFolder(props.getProperty("testingPath"), true);
 	}
 	
 	/**

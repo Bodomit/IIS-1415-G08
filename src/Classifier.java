@@ -25,9 +25,10 @@ public class Classifier implements IClassifier
 	{
 	}
 	
-	public void train(ArrayList<TrainingVector> vectors)
+	public void train(ArrayList<TrainingVector> vectors, boolean isVerbose)
 	{
-		System.out.print("\nTraining the classifier...");
+		if(isVerbose)
+			System.out.print("\nTraining the classifier...");
 		
 		// Get the number of features.
 		n = vectors.get(0).getVector().length;
@@ -141,7 +142,9 @@ public class Classifier implements IClassifier
 						b = (b1+b2)/2;
 	
 					numberOfChangedAlphas++;
-					System.out.print(".");
+					
+					if(isVerbose)
+						System.out.print(".");
 				}
 			}
 			
@@ -154,7 +157,8 @@ public class Classifier implements IClassifier
 		// Calculate the weights.
 		W = calculateWeights(X, Y);
 		
-		System.out.println("\nTraining Complete!");
+		if(isVerbose)
+			System.out.println("\nTraining Complete!");
 	}
 
 	private double[] calculateWeights(double[][] X, double[] Y) 

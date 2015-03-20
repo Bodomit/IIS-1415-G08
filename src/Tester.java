@@ -24,7 +24,7 @@ public class Tester {
 			fE = new FeatureExtractor();
 
 			// Get an image.
-			String path = "C:\\Users\\Bodomite\\Desktop\\IIS-1415-G08.git\\trunk\\Datasets\\crop\\training\\glaucoma5_crop.jpg";
+			String path = "C:\\Users\\40057686\\Desktop\\IIS-1415-G08.git\\trunk\\Datasets\\crop\\training\\glaucoma5_crop.jpg";
 
 			BufferedImage image = ImageOp.readInImage(path);
 			jV.imdisp(image, "Orginal", 50, 20);
