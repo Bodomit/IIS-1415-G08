@@ -221,15 +221,22 @@ public class Classifier implements IClassifier
 		// Scale all the vectors.
 		for(TrainingVector tVec : vectors)
 		{
-			double[] scaledVector = new double[n];
-			
-			for(int i = 0; i < n; i++)
-				scaledVector[i] = (tVec.getVector()[i] - trainingset_feature_mean[i]) / (0.5 * trainingset_feature_range[i]);
+			double[] scaledVector = scale(tVec.getVector());
 			
 			scaledVectors.add(new TrainingVector(tVec.isPositive(), scaledVector));
 		}
 		
 		return scaledVectors;
+	}
+	
+	private double[] scale(double[] vector)
+	{
+		double[] scaledVector = new double[n];
+		
+		for(int i = 0; i < n; i++)
+			scaledVector[i] = (vector[i] - trainingset_feature_mean[i]) / (0.5 * trainingset_feature_range[i]);
+		
+		return scaledVector;
 	}
 	
 	private double[][] calculateKernalMatrix_Linear(double[][] X)
@@ -317,6 +324,6 @@ public class Classifier implements IClassifier
 	
 	public boolean predict(double[] vector) 
 	{
-		return matrixMultiplication(vector, W) + b > 0 ? true : false;
+		return matrixMultiplication(scale(vector), W) + b > 0 ? true : false;
 	}
 }

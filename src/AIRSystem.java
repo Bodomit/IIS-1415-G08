@@ -1,5 +1,6 @@
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.io.FileNotFoundException;
@@ -22,7 +23,7 @@ public class AIRSystem {
 	public AIRSystem()
 	{
 		pre = new PreProcessor();
-		seg = new Segmenter(1.1);
+		seg = new Segmenter(1);
 		post = new PostProcessor();
 		feature = new FeatureExtractor();
 		classifier = new ClassifierNearestNeighbour(3);
@@ -40,6 +41,7 @@ public class AIRSystem {
 	/**
 	 * Trains the system using images in the given directory.
 	 * @param directory The directory containing the training images.
+	 * @throws HistogramException 
 	 */
 	public void train(File directory, boolean isVerbose)
 	{
@@ -50,17 +52,24 @@ public class AIRSystem {
 		// Process each image.
 		for(TrainingImage image: images)
 		{
-			// Get the actual image for processing.
-			BufferedImage processedImage = image.getImage();
+			try
+			{
+				// Get the actual image for processing.
+				BufferedImage processedImage = image.getImage();
 
-			// Process the image.
-			processedImage = pre.process(processedImage);
-			processedImage = seg.segment(processedImage);
-			processedImage = post.process(processedImage);
+				// Process the image.
+				processedImage = pre.process(processedImage);
+				processedImage = seg.segment(processedImage);
+				//processedImage = post.process(processedImage);
 
-			// Extract the features.
-			TrainingVector tVec = feature.extract(new TrainingImage(processedImage, image.isPositive()));
-			vectors.add(tVec);
+				// Extract the features.
+				TrainingVector tVec = feature.extract(new TrainingImage(processedImage, image.isPositive()));
+				vectors.add(tVec);
+			}
+			catch(Exception e)
+			{
+				System.err.println(e.getMessage());
+			}
 		}
 
 		if(isVerbose)
@@ -84,6 +93,7 @@ public class AIRSystem {
 	/**
 	 * Trains the system using images in the given directory.
 	 * @param directoryName The directory containing the training images.
+	 * @throws HistogramException 
 	 */
 	public void train(String directoryName, boolean isVerbose)
 	{
@@ -91,12 +101,12 @@ public class AIRSystem {
 		train(directory, isVerbose);
 	}
 
-	public boolean classify(BufferedImage image)
+	public boolean classify(BufferedImage image) throws HistogramException
 	{
 		// Process the image.
 		image = pre.process(image);
 		image = seg.segment(image);
-		image = post.process(image);
+		//image = post.process(image);
 
 		// Get the feature vector.
 		double[] featureVector = feature.extract(image);
@@ -135,17 +145,17 @@ public class AIRSystem {
 				if((isClassifiedGlaucoma && isGlaucoma) || (!isClassifiedGlaucoma && !isGlaucoma))
 				{
 					message += " - Correctly Classified.";
-					
+
 					if(isGlaucoma)
 						truePositives++;
 					else
 						trueNegatives++;
-					
+
 				}
 				else
 				{
 					message += " - Incorrectly Classified.";
-					
+
 					if(isClassifiedGlaucoma)
 						falsePositives++;
 					else
@@ -157,7 +167,7 @@ public class AIRSystem {
 					System.out.println(imagePath.getName() + ": " + message);
 			}
 
-		} catch (FileNotFoundException e) 
+		} catch (FileNotFoundException | HistogramException e) 
 		{
 			System.err.println(e.getMessage());
 		}
@@ -167,16 +177,18 @@ public class AIRSystem {
 		{
 			System.out.printf("\n\nNumber of images: %d", truePositives + trueNegatives + falsePositives + falseNegatives);
 			System.out.printf("\nNumber correctly classified: %d", truePositives + trueNegatives);
+			System.out.printf("\nAccuracy: %.2f%%", (double)(truePositives + trueNegatives) * 100f / (truePositives + trueNegatives + falsePositives + falseNegatives));
 			System.out.printf("\nTrue Negative rate: %.2f", (double)trueNegatives / (falsePositives + trueNegatives));
 			System.out.printf("\nTrue Positive rate: %.2f", (double)truePositives / (truePositives + falseNegatives));
-			System.out.printf("\nAccuracy: %.2f%%", (double)(truePositives + trueNegatives) * 100f / (truePositives + trueNegatives + falsePositives + falseNegatives));
+			System.out.printf("\nTrue Accuracy: %.2f%%", 50 * (((double)trueNegatives / (falsePositives + trueNegatives)) + ((double)truePositives / (truePositives + falseNegatives))));
 		}
 		else
 		{
-			System.out.printf("%6.2f%%, %6.2f%%, %6.2f%%", (double)trueNegatives * 100 / (falsePositives + trueNegatives), (double)truePositives * 100 / (truePositives + falseNegatives), (double)(truePositives + trueNegatives) * 100f / (truePositives + trueNegatives + falsePositives + falseNegatives));
+			//System.out.printf("%6.2f%%, %6.2f%%, %6.2f%%", (double)trueNegatives * 100 / (falsePositives + trueNegatives), (double)truePositives * 100 / (truePositives + falseNegatives), (double)(truePositives + trueNegatives) * 100f / (truePositives + trueNegatives + falsePositives + falseNegatives));
+			System.out.printf("%.0f %.0f", (double)(truePositives + trueNegatives) * 100f / (truePositives + trueNegatives + falsePositives + falseNegatives), 50 * (((double)trueNegatives / (falsePositives + trueNegatives)) + ((double)truePositives / (truePositives + falseNegatives))));
 		}
 
-		
+
 	}
 
 	public void classifyAllInFolder(String directoryName, boolean isVerbose)
@@ -199,9 +211,16 @@ public class AIRSystem {
 			if(!directory.isDirectory())
 				throw new FileNotFoundException("The directory \"" + directory.getAbsolutePath() + "\" does not exist.");
 
-			for(final File image : directory.listFiles())
-			{
+			// Get all the image files.
+			File[] imagePaths = directory.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".jpg");
+				}
+			});
 
+			for(final File image : imagePaths)
+			{
 				if(!image.isFile())
 					throw new FileNotFoundException(image.getName() + " does not exist.");
 

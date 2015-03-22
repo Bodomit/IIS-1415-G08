@@ -1,4 +1,5 @@
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 
 import com.sun.corba.se.spi.extension.ZeroPortPolicy;
 
@@ -7,37 +8,29 @@ public class PreProcessor
 {
 	private final int LINEAR_STRECTH_MINIMUM_PEAK_WIDTH;
 	private final int LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT;
-	private final int BRIGHTNESS_MODIFIER;
 	private final double GAMMA;
 	
 	public PreProcessor()
 	{
 		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = 3;
 		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT = 5;
-	    BRIGHTNESS_MODIFIER = 30;
-	    GAMMA = 1.5;
+	    GAMMA = 0.6;
 	}
 	
-	public PreProcessor(int linearStrechMinimumPeakWidth, int linearStrechMinimumPeakHeight, int brightnessModifier, double gamma)
+	public PreProcessor(int linearStrechMinimumPeakWidth, int linearStrechMinimumPeakHeight, double gamma)
 	{
 		LINEAR_STRECTH_MINIMUM_PEAK_WIDTH = linearStrechMinimumPeakWidth;
 		LINEAR_STRETCH_MINIMUM_PEAK_HEIGHT =linearStrechMinimumPeakHeight;
-		BRIGHTNESS_MODIFIER = brightnessModifier;
 		GAMMA = gamma;
 	}
 
-	public BufferedImage process(BufferedImage image)
+	public BufferedImage process(BufferedImage image) throws HistogramException
 	{
 		// Store a reference to the processed image.
 		BufferedImage processedImage = image;
 		
-		// Enhance brightness and contrast.
-		//processedImage = enhanceBrightness(processedImage);
-		processedImage = enhanceContrast(processedImage);
-		
-		// Reduce noise by Convolver or Median.
-		processedImage = reduceNoisebyConvolver(processedImage);
-		//processedImage = reduceNoiseByMedian(processedImage);
+		// Enhance contrast.
+		processedImage = enhanceContrast(processedImage);	
 		
 		// Return the processed image.
 		return processedImage;
@@ -57,18 +50,30 @@ public class PreProcessor
 		return data;
 	}
 
-	private BufferedImage enhanceBrightness(BufferedImage image)
+	private BufferedImage enhanceBrightness_Automated(BufferedImage image)
 	{
-		return ImageOp.pixelop(image,brightnessLut(BRIGHTNESS_MODIFIER));
+		// Get the mean brightness of the grey image.
+		int mean = mean(image);
+		
+		// Get the difference between the mean and the middle grey level.
+		int diff = (255/2) - mean;
+		
+		// Enhance the brightness
+		return enhanceBrightness(image, diff);
+	}
+	
+	private BufferedImage enhanceBrightness(BufferedImage image, int brightnessModifier)
+	{
+		return ImageOp.pixelop(image,brightnessLut(brightnessModifier));
 	}
 
-	private BufferedImage enhanceContrast(BufferedImage image)
+	private BufferedImage enhanceContrast(BufferedImage image) throws HistogramException
 	{
-		// Perform linear stretching.
+		BufferedImage processedImage = image;
+
+		processedImage = enhanceContrast_PowerLaw(processedImage);
 		
-		return enhanceContrast_LinearStretch_Automated(image);
-		//return enhanceContrast_PowerLaw(image);
-		// return enhanceContrast_HistogramEqualization(image)
+		return processedImage;
 	}
 	
 	private BufferedImage reduceNoisebyConvolver(BufferedImage image)
@@ -219,4 +224,18 @@ public class PreProcessor
     	Histogram histogram = new Histogram(image);
     	return ImageOp.pixelop(image, histogramEqualisationLut(histogram));
     }
+    
+    private int mean(BufferedImage image)
+	{
+		int width = image.getWidth();
+		int height = image.getHeight();
+		Raster rast = image.getRaster();
+		int sum = 0;
+		
+		for(int i =0; i<height; i++)
+			for(int j = 0; j<width; j++)
+				sum += rast.getSample(j, i, 0);
+		
+		return sum/(width*height);
+	}
 }
